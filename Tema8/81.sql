@@ -27,6 +27,6 @@ SELECT ProductID, MAX(UnitPrice) AS Price, SUM((UnitPrice * Quantity)*(1-Discoun
 GROUP BY ProductID 
 ORDER BY TotalFacturado
 
--- 6. ID del proveedor e importe total del stock acumulado de productos correspondientes a ese proveedor
+-- 6. ID del proveedor e importe total del stock acumulado de productos correspondientes a ese proveedor.
 SELECT * FROM Suppliers
 
