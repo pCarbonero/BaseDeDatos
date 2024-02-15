@@ -28,4 +28,5 @@ GROUP BY ProductID
 ORDER BY TotalFacturado
 
 -- 6. ID del proveedor e importe total del stock acumulado de productos correspondientes a ese proveedor.
+SELECT * FROM Suppliers
 
