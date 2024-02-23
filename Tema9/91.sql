@@ -37,10 +37,44 @@ WHERE EXISTS (SELECT ProductId FROM Products WHERE ProductId = 14 OR ProductId =
 
 -- 5. Empleados (ID, nombre, apellidos y teléfono) que han vendido algo a Bon app' o Frankenversand (nombre de la compañía).
 SELECT * FROM Employees
-SELECT * FROM Suppliers
-SELECT * FROM Shippers
+SELECT * FROM Customers
 SELECT * FROM Orders
-SELECT * FROM [Order Details]
 
--- 6. 
+SELECT 
+E.EmployeeID, (E.FirstName + ' ' + E.LastName) AS Name, E.HomePhone, C.CompanyName
+FROM Employees AS E
+INNER JOIN Orders AS O ON E.EmployeeID = O.EmployeeID
+INNER JOIN Customers AS C ON O.CustomerID = C.CustomerID
+WHERE C.CompanyName IN ('Bon app''', 'Frankenversand');
 
+
+-- 6. Empleados (ID, nombre, apellidos, mes y día de su cumpleaños) que no han vendido nunca nada a ningún cliente de Portugal. 
+
+SELECT 
+E.EmployeeID, (E.FirstName + ' ' + E.LastName) AS Name, BirthDate AS Cumple
+FROM Employees AS E WHERE EXISTS (SELECT Country FROM Customers WHERE Country NOT IN ('Portugal'));
+
+
+-- 7.Total de ventas en US$ de productos de cada categoría (nombre de la categoría).
+SELECT SUM(P.UnitPrice) AS Price, C.CategoryName
+FROM Products AS P
+INNER JOIN Categories AS C ON P.CategoryID = C.CategoryID
+GROUP BY P.UnitPrice, C.CategoryName
+
+--9. Ventas de cada producto en el año 97. Nombre del producto y unidades.
+SELECT * FROM [Product Sales for 1997]
+SELECT * FROM Products
+
+SELECT ProductId, ProductName
+FROM Products WHERE EXISTS (SELECT ProductName FROM [Product Sales for 1997]);
+
+-- 11. Empleados (nombre y apellidos) que trabajan a las órdenes de Andrew Fuller.
+SELECT * FROM Employees
+
+SELECT (FirstName + ' ' + LastName) AS Nombre 
+FROM Employees WHERE ReportsTo = 2
+
+-- 12. Número de subordinados que tiene cada empleado, incluyendo los que no tienen ninguno. Nombre, apellidos, ID.
+SELECT (FirstName + ' ' + LastName) AS Nombre, COUNT(ReportsTo) AS Subordiados 
+FROM Employees 
+GROUP BY FirstName, LastName
