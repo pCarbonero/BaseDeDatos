@@ -16,7 +16,9 @@ SELECT * FROM BI_Visitas
 SELECT M.Alias AS Name, M.Raza, M.Especie, M.FechaNacimiento
 FROM BI_Mascotas AS M 
 INNER JOIN BI_Visitas AS V ON M.Codigo = V.Mascota
-WHERE MONTH(V.Fecha) BETWEEN 3 AND 6
+WHERE MONTH(V.Fecha) = 3 AND DAY(V.Fecha) >= 20
+OR MONTH(V.Fecha) = 4 OR MONTH(V.Fecha) = 5
+OR MONTH(V.Fecha) = 6 AND DAY(V.Fecha) <= 20
 
 --3. Nombre y teléfono de los propietarios de mascotas que hayan sufrido rabia, sarna, artritis o filariosis y hayan tardado más de 10 días en curarse. 
 -- Los que no tienen fecha de curación, considera la fecha actual para calcular la duración del tratamiento.
@@ -33,7 +35,8 @@ INNER JOIN BI_Enfermedades AS E ON ME.IDEnfermedad = E.ID
 WHERE E.Nombre IN ('Rabia', 'Sarna', 'Artritis', 'Filariosis') 
 AND	DATEDIFF(DAY, ME.FechaInicio, ISNULL(Me.fechaCura,GETDATE()))>10
 
---4. Nombre y especie de las mascotas que hayan ido alguna vez a consulta mientras estaban enfermas. Incluye el nombre de la enfermedad que sufrían y la fecha de la visita.
+--4. Nombre y especie de las mascotas que hayan ido alguna vez a consulta mientras estaban enfermas. 
+--Incluye el nombre de la enfermedad que sufrían y la fecha de la visita.
 select * from BI_Mascotas
 select * from BI_Mascotas_Enfermedades
 select * from BI_Enfermedades
