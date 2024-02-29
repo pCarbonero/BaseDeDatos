@@ -59,17 +59,19 @@ JOIN BI_Mascotas M ON C.Codigo = M.CodigoPropietario
 GROUP BY C.Codigo, C.Nombre, C.Direccion, C.Telefono
 HAVING COUNT(DISTINCT M.Especie) >= 2
 
---6. Nombre, teléfono y número de mascotas de cada especie que tiene cada cliente. Mostrar también la especie de la mascota
+--6. Nombre, teléfono y número de mascotas de cada especie que tiene cada cliente. 
+--Mostrar también la especie de la mascota
 SELECT * FROM BI_Clientes
 select * from BI_Mascotas
 
 SELECT C.Nombre AS NombreCliente, C.Telefono, COUNT(M.Codigo) AS NumeroMascotas, M.Especie
-FROM BI_Clientes C
+FROM BI_Clientes AS C
 JOIN BI_Mascotas M ON C.Codigo = M.CodigoPropietario
 GROUP BY C.Codigo, C.Nombre, C.Telefono, M.Especie
 ORDER BY C.Nombre, M.Especie
 
---7. Nombre, especie y nombre del propietario de aquellas mascotas que hayan sufrido una enfermedad de tipo infeccioso (IN) o genético (GE) más de una vez.
+--7. Nombre, especie y nombre del propietario de aquellas mascotas que hayan sufrido una enfermedad de tipo infeccioso 
+--(IN) o genético (GE) más de una vez.
 SELECT * FROM BI_Clientes
 select * from BI_Mascotas
 select * from BI_Mascotas_Enfermedades
@@ -80,5 +82,6 @@ FROM BI_Clientes AS C
 JOIN BI_Mascotas AS M ON C.Codigo = M.CodigoPropietario
 JOIN BI_Mascotas_Enfermedades AS ME ON M.Codigo = ME.Mascota
 JOIN BI_Enfermedades AS E ON ME.IDEnfermedad = E.ID
+WHERE E.Tipo IN ('IN','GE')
 GROUP BY C.Nombre, C.Telefono, M.Especie
 HAVING COUNT(E.Tipo) > 1
