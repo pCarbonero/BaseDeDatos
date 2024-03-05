@@ -1,0 +1,2 @@
+--87. Listar los nombres de los clientes que tienen asignado como responsable a Alvaro Aluminio (su-
+-- poniendo que no pueden haber empleados con el mismo nombre).
