@@ -96,4 +96,23 @@ WHERE numclie in (SELECT TOP 3 numclie FROM Clientes Order By limitecredito Asc)
 DELETE Empleados
 WHERE numemp = 38
 
---17. 
+--17. Eliminar las oficinas que no tengan empleados.
+SELECT * FROM Oficinas
+SELECT * FROM Empleados
+
+DELETE Oficinas
+WHERE oficina not in (SELECT DISTINCT oficina FROM Empleados);
+
+--18. Elimiar cualquier rastro del cliente 2103 (datos y pedidos).
+SELECT * FROM Clientes
+DELETE Clientes
+Where numclie = 2103
+
+--19. Eliminar los empleado que han realizado al menos un pedido del fabricante ‘ACI’.
+SELECT * FROM Empleados
+SELECT * FROM Pedidos
+DELETE Empleados 
+FROM Empleados AS E
+INNER JOIN pedidos AS P
+ON E.numemp = P.resp
+WHERE P.fab = 'aci'
