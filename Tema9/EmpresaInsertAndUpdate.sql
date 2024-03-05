@@ -35,20 +35,35 @@ FROM Empleados AS E WHERE EXISTS (SELECT E.numemp, E.nombre FROM Empleados WHERE
 
 --7. Subir un 5% el precio de todos los productos del fabricante ‘ACI’.
 SELECT * FROM Productos
+
+BEGIN TRANSACTION [trEj7]
 UPDATE Productos
 SET precio = precio+(precio*0.05)
 WHERE idfab LIKE 'aci%'
+SELECT * FROM Productos
+COMMIT TRANSACTION [trEj7]
+ROLLBACK
 
 --8. Incrementar en uno la edad de los empleados.
 SELECT * FROM Empleados
+
+BEGIN TRANSACTION [trEj8]
 UPDATE Empleados
 Set edad = edad+1
+SELECT * FROM Empleados
+COMMIT TRANSACTION [trEj8]
+ROLLBACK
 
 --9. Cambiar los empleados de la oficina 21 a la oficina 30.
 SELECT * FROM Empleados
+
+BEGIN TRANSACTION [trEj9]
 UPDATE Empleados
 Set oficina = 30
 WHERE oficina = 21
+SELECT * FROM EMPLEADOS 
+COMMIT TRANSACTION [trEj9]
+ROLLBACK
 
 --10. De los empleados que trabajan en Cádiz, disminuir su cuota en un 10%.
 SELECT * FROM Empleados
@@ -112,7 +127,7 @@ Where numclie = 2103
 SELECT * FROM Empleados
 SELECT * FROM Pedidos
 DELETE Empleados 
-FROM Empleados AS E
+FROM Empleados AS E	
 INNER JOIN pedidos AS P
 ON E.numemp = P.resp
 WHERE P.fab = 'aci'
