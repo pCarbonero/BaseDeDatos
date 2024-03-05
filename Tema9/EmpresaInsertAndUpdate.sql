@@ -59,4 +59,41 @@ SET cuota = cuota-(cuota*0.1)
 WHERE EXISTS(SELECT oficina
 FROM Oficinas AS O WHERE O.oficina = EMPLEADOS.oficina AND O.ciudad = 'Cádiz')
 
---11. 
+--11. Bajar 100 euros el precio de los productos de los que no se han realizado ningún pedido. Hay que
+-- tener cuidado que no queden precios negativos.
+SELECT * FROM Productos
+SELECT * FROM Pedidos
+
+UPDATE Productos
+SET precio = precio-100 
+FROM Pedidos AS P 
+INNER JOIN Productos AS PR ON P.producto != PR.idproducto
+WHERE PR.precio >= 101
+
+--12. Modificar el nombre de los empleados para eliminar el segundo nombre o apellido (apellidos) de
+-- su nombre.
+SELECT * FROM Empleados
+UPDATE Empleados 
+SET nombre = SUBSTRING(nombre, 0, CHARINDEX ( ' ' , nombre))
+
+--13. Cambiar la cuota de todos los empleados a 1000 euros.
+UPDATE Empleados
+SET cuota = 1000
+
+--14. Eliminar los pedidos cuyo responsable es el empleado 105.
+SELECT * FROM Pedidos
+SELECT * FROM Empleados
+DELETE Pedidos
+WHERE resp = 105
+
+--15. Eliminar los tres clientes con menor límite de crédito.
+SELECT * FROM Clientes
+DELETE Clientes
+WHERE numclie in (SELECT TOP 3 numclie FROM Clientes Order By limitecredito Asc)
+
+--16. En un ejercicio anterior hemos insertado un nuevo empleado con nuestros datos. Eliminar dicho
+-- registro.
+DELETE Empleados
+WHERE numemp = 38
+
+--17. 
