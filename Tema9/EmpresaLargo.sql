@@ -1,3 +1,5 @@
+--/////PRIMERA PARTE/////--
+
 --87. Listar los nombres de los clientes que tienen asignado como responsable a Alvaro Aluminio (su-
 -- poniendo que no pueden haber empleados con el mismo nombre).
 SELECT * FROM Clientes
@@ -73,6 +75,121 @@ SELECT * FROM Oficinas
 WHERE EXISTS (SELECT * FROM Empleados WHERE Empleados.ventas > Oficinas.objetivo*0.55  AND Oficinas.oficina = Empleados.oficina)
 
 --98. Listar las oficinas donde todos los empleados tienen ventas que superan al 50% del objetivo de la oficina.
+SELECT * FROM Oficinas SELECT * FROM Empleados
+
+--99. Listar las oficinas que tengan un objetivo mayor que la suma de las cuotas de sus empleados.
+SELECT * FROM Oficinas
+SELECT * FROM Empleados
+
+SELECT * FROM  Oficinas
+WHERE objetivo > (SELECT SUM(cuota) FROM Empleados)
+
+
+--/////SEGUNDA PARTE/////--
+--53. Mostrar la información de los empleados junto a la información de las oficinas en las que trabajan.
+SELECT * FROM Empleados AS E
+INNER JOIN Oficinas AS O
+on E.oficina = O.oficina
+
+--54. Igual que el ejercicio anterior, pero mostrando solo los empleados que trabajan en las oficinas del sur.
+SELECT * FROM Empleados AS E
+INNER JOIN Oficinas AS O
+on E.oficina = O.oficina
+WHERE O.region = 'sur'
+
+--55. Igual que el ejercicio anterior, ordenando los empleados por edad.
+SELECT * FROM Empleados AS E
+INNER JOIN Oficinas AS O
+on E.oficina = O.oficina
+ORDER BY E.edad 
+
+--56. Escribir una consulta que muestre la información de todos los empleados junto a los datos de su oficina.
+SELECT * FROM Empleados AS E
+INNER JOIN Oficinas AS O
+on E.oficina = O.oficina
+
+--57. Escribir una consulta que muestre la información de todos los empleados (trabajen o no en una oficina) junto a la información de su oficina.
+SELECT * FROM Empleados AS E
+LEFT JOIN Oficinas AS O
+on E.oficina = O.oficina
+ORDER BY E.edad 
+
+--58. Listar las oficinas del este indicando para cada una de ellas su número, ciudad, números y nombres de sus empleados.
+-- Hacer una versión en la que aparecen sólo las que tienen empleados, y hacer otra en las que además aparezcan las oficinas del este que no tienen empleados.			
+SELECT * FROM Oficinas
+SELECT * FROM Empleados
+
+--V1
+SELECT O.oficina, O.ciudad, O.objetivo, O.ventas, E.nombre FROM Oficinas AS O
+INNER JOIN Empleados AS E ON O.oficina = E.oficina
+WHERE O.region = 'este'
+
+--V2
+SELECT O.oficina, O.ciudad, O.objetivo, O.ventas, E.nombre FROM Oficinas AS O
+LEFT JOIN Empleados AS E ON O.oficina = E.oficina
+WHERE O.region = 'este'
+
+--59. Listar los pedidos mostrando su número de pedido e importe, junto a la información del cliente (nombre y límite de crédito) que realiza el pedido.
+SELECT P.numpedido, p.importe FROM Pedidos AS P
+INNER JOIN Clientes AS C ON P.clie = C.numclie
+
+--60. Igual que el ejercicio anterior mostrando además la información del empleado que fue responsable de este pedido.
+SELECT * FROM Empleados
+SELECT * FROM Clientes
+SELECT * FROM Pedidos
+
+SELECT P.numpedido, p.importe, E.* FROM Pedidos AS P --E.* significa que además añada la informacion del empleado
+INNER JOIN Clientes AS C ON P.clie = C.numclie
+INNER JOIN Empleados AS E On p.resp = e.numemp
+
+--61. Mostrar para cada producto la información de sus pedidos
+SELECT * FROM Productos
+SELECT * FROM Pedidos
+
+SELECT * FROM Productos
+LEFT JOIN Pedidos ON Productos.idproducto = Pedidos.producto
+
+--62. Listar los datos de cada uno de los empleados, la ciudad y región en donde trabaja.
+SELECT E.*, o.ciudad, o.region FROM Empleados AS E
+INNER JOIN Oficinas AS O ON E.oficina = O.oficina
+
+--63. Listar todas las oficinas con objetivo superior a 60.000 euros indicando para cada una de ellas el nombre de su director.
+SELECT * FROM Empleados
 SELECT * FROM Oficinas
 
+SELECT O.*, E.nombre AS Jefe FROM Oficinas AS O
+INNER JOIN Empleados AS E ON O.oficina = E.oficina
+WHERE O.objetivo > 60000 AND O.dir = E.numemp
 
+--64. Listar los pedidos superiores a 2.500 euros, incluyendo el nombre del empleado responsable del
+-- pedido y el nombre del cliente que lo solicitó. Ordenar la consulta por el nombre del cliente.
+SELECT * FROM Pedidos
+SELECT * FROM Clientes
+SELECT * FROM Empleados
+
+SELECT P.*, E.nombre AS Responsable, C.nombre AS Cliente FROM Pedidos AS P
+INNER JOIN Clientes AS C ON P.clie = C.numclie
+INNER JOIN Empleados AS E ON P.resp = E.numemp
+WHERE importe > 2500
+ORDER BY C.nombre
+
+--65. Listar ordenados por el nombre los empleados que han realizado algún pedido.
+SELECT * FROM Empleados
+WHERE numemp IN (SELECT resp FROM Pedidos)
+
+--66. Hallar los empleados que realizaron su primer pedido el mismo día que fueron contratados.
+SELECT * FROM Empleados
+WHERE numemp IN (SELECT resp FROM Pedidos WHERE Empleados.contrato = Pedidos.fechapedido)
+
+-- 68. Listar los números de los empleados que son responsables de un pedido superior a 1.000 euros o
+-- que tengan una cuota inferior a 5.000 euros.
+SELECT E.numemp FROM Empleados AS E
+INNER JOIN Pedidos AS P On E.numemp = P.resp 
+WHERE P.importe > 1000 OR E.cuota < 5000
+
+-- 69. Mostrar las oficinas que no tienen director o que se encuentran en la región sur.
+SELECT * FROM Oficinas
+WHERE dir IS NULL OR region = 'sur'
+
+-- 70. Listar las oficinas que no tienen director o en las que trabaja alguien.
+--nose :(
