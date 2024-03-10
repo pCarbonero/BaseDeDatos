@@ -1,5 +1,5 @@
 --/////PRIMERA PARTE/////--
-
+use Empresa
 --87. Listar los nombres de los clientes que tienen asignado como responsable a Alvaro Aluminio (su-
 -- poniendo que no pueden haber empleados con el mismo nombre).
 SELECT * FROM Clientes
@@ -193,3 +193,73 @@ WHERE dir IS NULL OR region = 'sur'
 
 -- 70. Listar las oficinas que no tienen director o en las que trabaja alguien.
 --nose :(
+
+
+-- 71. ¿Cuál es la cuota media y las ventas medias de todos los empleados?
+SELECT AVG(cuota) AS CuotaMedia, AVG(ventas) AS VentasMedia FROM Empleados 
+
+-- 72. Edad media de los empleados.
+SELECT AVG(edad) AS EdadMedia FROM Empleados 
+
+-- 73. Edad del empleado más joven y del mayor.
+SELECT edad FROM Empleados
+WHERE edad = (SELECT MAX(edad) FROM Empleados)
+OR edad = (SELECT MIN(edad) FROM Empleados)
+
+-- 74. Hallar el importe medio de pedidos, el importe total de pedidos y el precio medio de venta (el precio de venta es el precio unitario en cada pedido).
+SELECT * FROM Pedidos
+SELECT * FROM Productos
+
+SELECT AVG(Pe.importe) AS importeMedio, SUM(Pe.importe) AS totalPedidos, AVG(Pr.precio) AS precioMedioVentas FROM Pedidos AS Pe
+INNER JOIN Productos AS Pr ON Pe.producto = Pr.idproducto
+
+-- 75. Hallar el precio medio de los productos del fabricante ‘ACI’.
+SELECT AVG(precio) FROM Productos
+WHERE idfab IN ('ACI')
+
+-- 76. ¿Cuál es el importe total de los pedidos realizados por el empleado Vicente Vino?
+SELECT * FROM Empleados
+SELECT * FROM Pedidos
+
+SELECT SUM(P.importe) AS precioTotal FROM Pedidos AS P
+WHERE resp = (SELECT numemp FROM Empleados AS E WHERE E.nombre = 'Vicente Vino')
+
+-- 77. Hallar en qué fecha se realizó el primer pedido.
+SELECT MIN(fechaPedido) FROM Pedidos
+
+-- 78. Hallar cuántos pedidos hay de más de 5.000 euros.
+SELECT COUNT(importe) AS numPedidosMayor5k FROM Pedidos
+WHERE importe > 5000
+
+-- 79. Listar cuántos empleados están asignados a cada oficina, indicar el número de oficina.
+SELECT O.oficina, COUNT(E.oficina) AS cant FROM Oficinas AS O
+INNER JOIN Empleados AS E ON O.oficina = E.oficina
+GROUP BY O.oficina 
+
+-- 80. Mostrar el número de oficinas que existen en cada región.
+SELECT region, COUNT(oficina) as numOfis From Oficinas
+GROUP BY region
+
+-- 81. Saber cuántas oficinas tienen algún empleado con ventas superiores a su cuota, no queremos saber cuales sino cuántas hay.
+SELECT COUNT(O.oficina) AS numOfis FROM Oficinas AS O
+INNER JOIN Empleados AS E ON O.oficina = E.oficina
+WHERE E.ventas > E.cuota
+
+-- 82. Para cada empleado, obtener su número, nombre, e importe vendido a cada cliente indicando el número de cliente.
+SELECT E.numemp, E.nombre, P.importe, P.clie FROM Empleados AS E
+LEFT JOIN Pedidos AS P ON E.numemp = P.resp
+
+-- 83. Para cada empleado cuyos pedidos suman más de 3.000 euros, hallar su importe medio de pedidos. 
+-- En el resultado indicar el número de empleado y su importe medio de pedidos.
+
+-- 85. Escribir una consulta SQL que indique el número de empleados que trabaja en cada oficina.
+SELECT O.oficina, COUNT(E.oficina) AS cant FROM Oficinas AS O
+LEFT JOIN Empleados AS E ON O.oficina = E.oficina
+GROUP BY O.oficina 
+
+-- 86. Igual que el ejercicio anterior pero mostrando las oficinas donde trabajan 3 o más empleados.
+SELECT O.oficina, COUNT(E.oficina) AS cant FROM Oficinas AS O
+LEFT JOIN Empleados AS E ON O.oficina = E.oficina
+GROUP BY O.oficina 
+HAVING COUNT(E.oficina) >= 3
+
