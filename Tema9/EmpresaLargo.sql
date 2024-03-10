@@ -192,7 +192,6 @@ SELECT * FROM Oficinas
 WHERE dir IS NULL OR region = 'sur'
 
 -- 70. Listar las oficinas que no tienen director o en las que trabaja alguien.
---nose :(
 
 
 -- 71. ¿Cuál es la cuota media y las ventas medias de todos los empleados?
