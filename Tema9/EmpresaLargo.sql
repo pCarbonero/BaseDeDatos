@@ -81,7 +81,7 @@ SELECT * FROM Oficinas
 SELECT * FROM Empleados
 
 SELECT * FROM  Oficinas
-WHERE objetivo > (SELECT SUM(cuota) FROM Empleados WHERE Empleados . oficina  =  Oficinas . oficina)
+WHERE objetivo > (SELECT SUM(cuota) FROM Empleados WHERE Empleados.oficina  =  Oficinas.oficina)
 
 
 
@@ -197,6 +197,15 @@ WHERE dir IS NULL OR region = 'sur'
 
 -- 71. ¿Cuál es la cuota media y las ventas medias de todos los empleados?
 SELECT AVG(cuota) AS CuotaMedia, AVG(ventas) AS VentasMedia FROM Empleados 
+
+--71,2. Listar las oficinas que no tienen director o en las que trabaja alguien.
+-- Mostrar todos los campos de la oficina más un campo que indique 'Oficinas sin director' para los empleados que no tengan director, y 'Oficina con Empleado' para las oficinas que tienen empleados.
+
+Select CONCAT('SINDIR ', oficina) FROM Oficinas 
+WHERE dir IS null
+UNION
+SELECT CONCAT('CONEMP ', o.oficina) FROM Oficinas O
+INNER JOIN Empleados AS E ON E.oficina = o.oficina;   
 
 -- 72. Edad media de los empleados.
 SELECT AVG(edad) AS EdadMedia FROM Empleados 
