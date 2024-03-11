@@ -75,14 +75,15 @@ SELECT * FROM Oficinas
 WHERE EXISTS (SELECT * FROM Empleados WHERE Empleados.ventas > Oficinas.objetivo*0.55  AND Oficinas.oficina = Empleados.oficina)
 
 --98. Listar las oficinas donde todos los empleados tienen ventas que superan al 50% del objetivo de la oficina.
-SELECT * FROM Oficinas SELECT * FROM Empleados
 
 --99. Listar las oficinas que tengan un objetivo mayor que la suma de las cuotas de sus empleados.
 SELECT * FROM Oficinas
 SELECT * FROM Empleados
 
 SELECT * FROM  Oficinas
-WHERE objetivo > (SELECT SUM(cuota) FROM Empleados)
+WHERE objetivo > (SELECT SUM(cuota) FROM Empleados WHERE Empleados . oficina  =  Oficinas . oficina)
+
+
 
 
 --/////SEGUNDA PARTE/////--
