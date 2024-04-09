@@ -47,6 +47,18 @@ GROUP BY PA.Name, P.Name, P.ListPrice
 
 -----------------------------------------------------------------------------------------------
 
---3. Total de Ventas en cada país en dinero (Ya hecha en el boletín 9.3).
 
---4. Número de clientes que tenemos en cada país. Contaremos cada dirección como si fuera un cliente distinto.
+
+--4.Número de clientes que tenemos en cada país. Contaremos cada dirección como si fuera un cliente distinto.
+CREATE VIEW ClientesPoPais AS
+SELECT A.CountryRegion, COUNT(CA.AddressID) AS ClientesPoPais FROM SalesLT.Address as A
+INNER JOIN SalesLT.CustomerAddress as CA
+ON A.AddressID=CA.AddressID
+GROUP BY A.CountryRegion
+
+--5.Repite la consulta anterior pero contando cada cliente una sola vez. Si el cliente tiene varias direcciones, 
+--  sólo consideraremos aquella en la que nos haya comprado la última vez.
+SELECT A.CountryRegion, COUNT(DISTINCT CA.CustomerID) AS [Clientes por país] FROM SalesLT.Address as A
+INNER JOIN SalesLT.CustomerAddress as CA
+ON A.AddressID=CA.AddressID
+GROUP BY A.CountryRegion
