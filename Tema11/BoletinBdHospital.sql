@@ -115,5 +115,63 @@ END
 EXECUTE ej07
 @valor = 'DE'
 
---8.  
+--8.  Crear un procedimiento que recupere el número departamento, el nombre y número de empleados, 
+-- dándole como valor el nombre del departamento, si el nombre introducido no es válido, 
+-- mostraremos un mensaje informativo comunicándolo.
+CREATE PROCEDURE ej08
+@dNom varCHar(20)
+AS BEGIN
 
+if @dNom IS NOT NULL AND @dNom IN (SELECT DNombre FROM Dept)
+	SELECT D.Dept_No, D.DNombre, COUNT(E.Emp_No) AS NumeroEmpleados FROM Dept D
+	INNER JOIN Emp E ON D.Dept_No = E.Dept_No
+	WHERE D.DNombre = @dNom
+	GROUP BY D.Dept_No, D.DNombre
+ELSE
+	PRINT 'Nombre no válido'
+END
+
+EXECUTE ej08
+@dNom = 'INVESTIGACIÓN'
+
+--9. 
+DROP PROCEDURE ej09
+CREATE PROCEDURE ej09
+@campo varChar(50)
+AS BEGIN
+if @campo in (SELECT Nombre FROM Hospital)
+	BEGIN
+	SELECT COUNT(P.Empleado_No) AS numEmpleados, AVG(Salario) as mediaSalario, SUM(Salario) as totalSalario, H.Nombre
+	FROM Plantilla P
+	INNER JOIN Hospital H On H.Hospital_Cod = P.Hospital_Cod where @campo = H.Nombre
+	GROUP BY H.Nombre
+	END
+ELSE IF @campo in (SELECT Nombre FROM Sala)
+	BEGIN
+	SELECT COUNT(P.Empleado_No) AS numEmpleados, AVG(Salario) as mediaSalario, SUM(Salario) as totalSalario, S.Nombre
+	FROM Plantilla P 
+	INNER JOIN Sala S ON P.Sala_Cod = S.Sala_Cod
+	GROUP BY S.Nombre
+	END
+ELSE IF @campo in (SELECT t FROM Plantilla)
+	BEGIN
+	SELECT COUNT(P.Empleado_No) AS numEmpleados, AVG(P.Salario) as mediaSalario, SUM(P.Salario) as totalSalario, P.T
+	FROM Plantilla P
+	GROUP BY P.T
+	END
+ELSE IF @campo in (SELECT funcion FROM Plantilla)
+	BEGIN
+	SELECT COUNT(P.Empleado_No) AS numEmpleados, AVG(P.Salario) as mediaSalario, SUM(P.Salario) as totalSalario, P.Funcion
+	FROM Plantilla P WHERE @campo = P.Funcion
+	GROUP BY P.Funcion
+	END
+ELSE 
+	BEGIN 
+	PRINT 'NO VALE'
+	END
+END
+SELECT * FROM Plantilla
+EXECUTE ej09 
+@campo = 'ENFERMERO'
+/*
+*/
