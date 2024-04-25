@@ -30,7 +30,9 @@ while @actual < @num
 	END
 RETURN @sucesion
 END
-SELECT dbo.ej02Fibonacci(15) AS SUCESION
+SELECT dbo.ej02Fibonacci(620) AS SUCESION
+
+--
 
 --3. OBTENER DESCUENTO MÁXIMO POR CATEGORÍA:
 select * from [Order Details]
@@ -46,4 +48,46 @@ SELECT * FROM dbo.ej03Dis()
 --4. Obtener los DÍAS LABORABLES ENTRE DOS FECHAS:
 
 --5. OBTENER TOTAL DE PEDIDOS POR CLIENTE:
-SELECT * FROM 
+SELECT * FROM Orders
+SELECT * FROM Customers
+
+CREATE OR ALTER FUNCTION ej05pedidosClientes()
+RETURNS TABLE
+RETURN (SELECT CustomerID, COUNT(CustomerID) as totalPedidos FROM Orders
+GROUP BY CustomerID)
+
+SElECT * FROM ej05pedidosClientes()
+
+--6. Función que calcule el promedio de una serie de valores. 
+-- Los parámetros de la función se pasarán de forma ‘1,2,3,4….’:
+CREATE OR ALTER FUNCTION ej06Numeros(@numeritos varChar(100))
+RETURNS VARCHAR(100)
+AS BEGIN
+declare @res decimal(9,2) 
+SET @res = (SELECT AVG(CAST(VALUE AS decimal(9,2))) as asaa FROM STRING_SPLIT(@numeritos, ','))
+RETURN @res
+END
+SELECT dbo.ej06Numeros('3, 0, 5, 3') as asaa
+
+--7. OBTENER LOS DETALLES DE PEDIDOS DE  TODOS LOS CLIENTES. 
+-- Obtener el identificador de la orden, el nombre del producto, la cantidad pedida y el nombre de la compañia.:	
+CREATE FUNCTION ej07details()
+RETURNS TABLE 
+RETURN(SELECT O.customerID, OD.* FROM [Order Details] OD
+INNER JOIN ORDERS AS O ON OD.OrderID = O.OrderID)
+
+SELECT * FROM ej07details()
+
+--8.  OBTENER VENTAS MENSUALES POR CATEGORÍA. 
+-- Mostrar por cada año y mes, el nombre de la categoría y la cantidad de ventas realizadas.:
+SELECT * FROM [Sales by Category]
+SELECT * FROM [Summary of Sales by Year]
+
+-- 10. OBTENER LOS 10 PRODUCTOS MÁS VENDIDOS:
+CREATE OR ALTER FUNCTION ej10top()
+RETURNS TABLE 
+RETURN(SELECT TOP 10 * FROM [Sales by Category] order by ProductSales desc)
+
+select * from ej10top()
+
+
