@@ -173,5 +173,22 @@ END
 SELECT * FROM Plantilla
 EXECUTE ej09 
 @campo = 'ENFERMERO'
-/*
-*/
+
+--10. Crear un procedimiento en el que pasaremos como parámetro el Apellido de un empleado.
+-- El procedimiento devolverá los subordinados del empleado escrito, si el empleado no existe en la base de datos, 
+-- informaremos de ello, si el empleado no tiene subordinados, lo informa remos con un mensaje y mostraremos su jefe.
+-- Mostrar el número de empleado, Apellido, Oficio y Departamento de los subordinados.
+CREATE PROCEDURE ej10
+@nombre varchar(50)
+AS BEGIN 
+IF @nombre IS NOT NULL AND @nombre IN (SELECT DNombre FROM Dept)
+    SELECT d.Dept_No, D.DNombre, COUNT(E.Emp_No) as numEmp, d.DNombre FROM Dept as d
+    INNER JOIN Emp as E
+    ON D.Dept_No=E.Dept_No
+    GROUP BY D.Dept_No, D.DNombre
+ELSE
+    PRINT 'El nombre introducido no es correcto'
+END
+
+EXECUTE ej10
+@nombre = 'CONTABILIDAD'
