@@ -83,6 +83,11 @@ SELECT * FROM ej07details()
 SELECT * FROM [Sales by Category]
 SELECT * FROM [Summary of Sales by Year]
 
+--9. OBTENER RESUMEN SEMANAL DE VENTAS. Queremos mostrar por cada semana, las ventas realizadas.
+
+
+
+
 -- 10. OBTENER LOS 10 PRODUCTOS MÁS VENDIDOS:
 CREATE OR ALTER FUNCTION ej10top()
 RETURNS TABLE 
