@@ -47,6 +47,7 @@ SELECT * FROM dbo.ej03Dis()
 
 --4. Obtener los DÍAS LABORABLES ENTRE DOS FECHAS:
 
+
 --5. OBTENER TOTAL DE PEDIDOS POR CLIENTE:
 SELECT * FROM Orders
 SELECT * FROM Customers
@@ -80,11 +81,24 @@ SELECT * FROM ej07details()
 
 --8.  OBTENER VENTAS MENSUALES POR CATEGORÍA. 
 -- Mostrar por cada año y mes, el nombre de la categoría y la cantidad de ventas realizadas.:
-SELECT * FROM [Sales by Category]
+SELECT * FROM Products
+SELECT * FROM [Order Details]
 SELECT * FROM [Summary of Sales by Year]
+select * from [Sales by Category]
+
+CREATE OR ALTER FUNCTION ej08 ()
+RETURNS TABLE
+RETURN (SELECT DATENAME(year, SS.ShippedDate) as año, DATENAME(month, SS.ShippedDate) as mes, C.CategoryName, C.ProductSales FROM [Summary of Sales by Year] AS SS
+inner join [Order Details] as OD ON SS.OrderID = OD.OrderID
+INNER JOIN Products AS P ON OD.ProductID = P.ProductID
+INNER JOIN [Sales by Category] AS C ON P.CategoryID = C.CategoryID
+GROUP BY DATENAME(year, SS.ShippedDate), DATENAME(month, SS.ShippedDate), C.CategoryName, C.ProductSales)
+
+SELECT * FROM dbo.ej08()
+
 
 --9. OBTENER RESUMEN SEMANAL DE VENTAS. Queremos mostrar por cada semana, las ventas realizadas.
-
+SELECT DATENAME(WEEK, SS.ShippedDate), SS.Subtotal FROM [Summary of Sales by Year] AS SS group by DATENAME(WEEK, SS.ShippedDate)
 
 
 
