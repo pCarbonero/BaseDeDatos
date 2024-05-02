@@ -46,6 +46,28 @@ GROUP BY P.CategoryID)
 SELECT * FROM dbo.ej03Dis()
 
 --4. Obtener los DÍAS LABORABLES ENTRE DOS FECHAS:
+CREATE OR ALTER FUNCTION ej04dias(@fechaInicio date, @fechaFinal date)
+RETURNS int
+AS BEGIN
+declare @diasTot int = 0
+declare @fechaLimit date = @fechaInicio
+
+WHILE @fechaLimit < @fechaFinal
+	BEGIN
+	SET @fechaLimit = DATEADD(DAY, 1, @fechaLimit);
+	if (DATEPART(WEEKDAY, @fechaLimit) IN (1,2,3,4,5))
+	BEGIN
+		SET @diasTot+=1;
+		END
+	END
+RETURN @diasTot;
+END
+
+SELECT dbo.ej04dias('02-01-2003', '02-01-2004') as a
+
+
+
+
 
 
 --5. OBTENER TOTAL DE PEDIDOS POR CLIENTE:
@@ -98,8 +120,17 @@ SELECT * FROM dbo.ej08()
 
 
 --9. OBTENER RESUMEN SEMANAL DE VENTAS. Queremos mostrar por cada semana, las ventas realizadas.
-SELECT DATENAME(WEEK, SS.ShippedDate), SS.Subtotal FROM [Summary of Sales by Year] AS SS group by DATENAME(WEEK, SS.ShippedDate)
+CREATE or ALTER FUNCTION ej09semanas (
+) RETURNS table 
+AS return (
+    SELECT datepart(week,o.OrderDate) as semana, sum(od.Quantity)  as ventas
+    from Orders as o
+    inner join [Order Details] as od
+    on o.OrderID = od.OrderID
+    group by datepart(week,o.OrderDate)
+)
 
+SELECT * from dbo.ej09semanas() order by semana;
 
 
 -- 10. OBTENER LOS 10 PRODUCTOS MÁS VENDIDOS:
@@ -108,5 +139,4 @@ RETURNS TABLE
 RETURN(SELECT TOP 10 * FROM [Sales by Category] order by ProductSales desc)
 
 select * from ej10top()
-
 
