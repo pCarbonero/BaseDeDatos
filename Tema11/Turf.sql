@@ -88,15 +88,42 @@ END
 
 SELECT dbo.FnDineroApostado(1) as TotalCarrera
 
-SELECT dbo.FnTotalApostadoCC(1,1)  as TotalAUnCaballo
 
-CREATE OR ALTER FUNCTION FnPremio1(@idCarrera int, @idCaballo int)
-RETURNS decimal(2,1)
-AS BEGIN
-	declare @Premio1 decimal(2,1) = (dbo.FnDineroApostado(@idCarrera)/dbo.FnTotalApostadoCC(@idCarrera, @idCaballo) * 0.6)
-Return @Premio1
-END
+CREATE OR ALTER FUNCTION FnPremio1(@idCarrera int)
+RETURNS TABLE
+RETURN(SELECT SUM((dbo.FnDineroApostado(1)/Importe)*0.6) AS Premio1, IDCaballo FROM LTApuestas 
+WHERE IDCarrera = @idCarrera GROUP BY IDCaballo)
 
-SELECT dbo.FnPremio1(1,1)
+SELECT * FROM FnPremio1(1)
+
+CREATE OR ALTER FUNCTION FnPremio2(@idCarrera int)
+RETURNS TABLE
+RETURN(SELECT SUM((dbo.FnDineroApostado(1)/Importe)*0.2) AS Premio2, IDCaballo FROM LTApuestas 
+WHERE IDCarrera = @idCarrera GROUP BY IDCaballo)
+
+SELECT * FROM FnPremio2(1)
+
+CREATE OR ALTER FUNCTION FnCore04(@idCarrera int)
+RETURNS TABLE
+RETURN(SELECT a1.IDCaballo, P1.Premio1, P2.Premio2 FROM dbo.FnCaballosCarrera(@idCarrera) as a1
+		INNER JOIN dbo.FnPremio1(@idCarrera) P1 ON P1.IDCaballo = a1.IDCaballo
+		INNER JOIN dbo.FnPremio2(@idCarrera) P2 ON P2.IDCaballo = a1.IDCaballo)
 
 
+SELECT * FROM FnCore04(1)
+
+--5. Crea una función FnPalmares que reciba un ID de caballo y un rango de fechas y nos devuelva el palmarés de ese caballo en ese intervalo de tiempo.
+-- El palmarés es el número de victorias, segundos puestos, etc. Se devolverá una tabla con dos columnas: 
+-- Posición y NumVeces, que indicarán, respectivamente, cada una de las posiciones y las veces que el caballo ha obtenido ese resultado. 
+SELECT * FROM LTCaballosCarreras
+SELECT * FROM LTCarreras
+CREATE OR ALTER FUNCTION FnPalmares (@idCaballo int, @fechaInicial date, @fechaFinal date)
+RETURNS TABLE 
+RETURN(SELECT CC.Posicion, Count(CC.Posicion) As numVeces FROM LTCaballosCarreras AS CC
+		INNER JOIN LTCarreras as C ON CC.IDCarrera = C.ID
+		WHERE CC.IDCaballo = @idCaballo AND C.Fecha BETWEEN @fechaInicial AND @fechaFinal AND CC.Posicion IS NOT NULL
+		GROUP by CC.Posicion)
+
+SELECT * FROM FnPalmares(1, '2017-02-27', '2019-03-11')
+
+--6. 
