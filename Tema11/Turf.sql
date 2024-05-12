@@ -126,4 +126,44 @@ RETURN(SELECT CC.Posicion, Count(CC.Posicion) As numVeces FROM LTCaballosCarrera
 
 SELECT * FROM FnPalmares(1, '2017-02-27', '2019-03-11')
 
---6. 
+--6. Crea una función FnCarrerasHipodromo que nos devuelva las carreras celebradas en un hipódromo en un rango de fechas.
+-- La función recibirá como parámetros el nombre del hipódromo y la fecha de inicio y fin del intervalo y nos devolverá una tabla con las siguientes columnas: 
+-- Fecha de la carrera, número de orden, numero de apuestas realizadas, número de caballos inscritos, número de caballos que la finalizaron y nombre del ganador.
+SELECT * FROM LTCarreras
+SELECT * FROM LTApuestas
+SELECT * FROM LTCaballosCarreras
+SELECT * FROM LTCaballos
+CREATE OR ALTER FUNCTION FnCarrerasHipodromo(@nombre varChar(100), @fechaIncio date, @fechaFin date)
+RETURNS TABLE
+RETURN()
+
+SELECT C.Fecha, C.NumOrden, COUNT(A.IDCarrera) AS numApuestas, COUNT(distinct CC.IDCaballo) AS numCaballo, 
+COUNT(DISTINCT CASE WHEN CC.Posicion IS NOT NULL THEN CC.IDCaballo END) AS numFin,
+CB.Nombre AS ganador
+FROM LTCarreras C
+INNER JOIN LTApuestas A ON C.ID = A.IDCarrera
+INNER JOIN LTCaballosCarreras CC ON C.ID = CC.IDCarrera
+INNER JOIN LTCaballos CB ON CC.IDCaballo = CB.ID
+GROUP BY C.Fecha, C.NumOrden
+
+-- 7.Crea una función FnObtenerSaldo a la que pasemos el ID de un jugador y una fecha y nos devuelva su saldo en esa fecha. Si se omite la fecha, se devolverá el saldo actual
+SELECT * FROM LTJugadores
+SELECT * FROM LTApuntes
+
+CREATE OR ALTER FUNCTION FnObtenerSaldo(@id int, @fecha date)
+RETURNS money
+AS BEGIN
+declare @qua money
+if	(@fecha in (SELECT fecha FROM LTApuntes))
+BEGIN 
+	SET @qua = (SELECT A.Saldo FROM LTApuntes A
+	INNER JOIN LTJugadores J ON A.IDJugador = J.ID
+	WHERE A.IDJugador = @id AND A.Fecha = @fecha)
+END
+ELSE
+	BEGIN
+	SET @qua = NULL 
+	END
+RETURN @qua
+END
+SELECT dbo.FnObtenerSaldo(1, '2015-01-01') AS SALDO
