@@ -130,20 +130,34 @@ SELECT * FROM FnPalmares(1, '2017-02-27', '2019-03-11')
 -- La función recibirá como parámetros el nombre del hipódromo y la fecha de inicio y fin del intervalo y nos devolverá una tabla con las siguientes columnas: 
 -- Fecha de la carrera, número de orden, numero de apuestas realizadas, número de caballos inscritos, número de caballos que la finalizaron y nombre del ganador.
 SELECT * FROM LTCarreras
-SELECT * FROM LTApuestas where IDCarrera = 10
-SELECT * FROM LTCaballosCarreras where IDCarrera = 2
+SELECT * FROM LTApuestas where IDCarrera = 21
+SELECT * FROM LTCaballosCarreras 
 SELECT * FROM LTCaballos
+
 CREATE OR ALTER FUNCTION FnCarrerasHipodromo(@nombre varChar(100), @fechaIncio date, @fechaFin date)
 RETURNS TABLE
-RETURN()
-
-SELECT C.ID, C.Fecha, C.NumOrden, COUNT(A.IDCarrera) AS numApuestas, COUNT(distinct CC.IDCaballo) AS numCaballo,
+RETURN(SELECT C.ID, C.Fecha, C.NumOrden, COUNT(distinct A.ID) AS numApuestas, COUNT(distinct CC.IDCaballo) AS numCaballo,
 COUNT(DISTINCT CASE WHEN CC.Posicion IS NOT NULL THEN CC.IDCaballo END) AS numFin,
-(CASE WHEN CC.Posicion = 1 THEN CC.IDCaballo END) AS ganador FROM LTCarreras C
+CG.ganador 
+FROM LTCarreras C
 INNER JOIN LTApuestas A ON C.ID = A.IDCarrera
 INNER JOIN LTCaballosCarreras CC ON C.ID = CC.IDCarrera
-INNER JOIN LTCaballos CB ON CC.IDCaballo = CB.ID
-GROUP BY C.ID, C.Fecha, C.NumOrden, CC.Posicion, CC.IDCaballo
+INNER JOIN dbo.FnCaballoGanador(@nombre, @fechaIncio, @fechaFin) CG ON CG.ID = C.ID
+WHERE C.Hipodromo = @nombre AND C.Fecha BETWEEN @fechaIncio AND @fechaFin
+GROUP BY C.ID, C.Fecha, C.NumOrden, CG.ganador)
+
+SELECT * FROM dbo.FnCarrerasHipodromo('Gran Hipodromo de Andalucia', '2000-01-20', '2028-03-03')
+
+
+CREATE OR ALTER FUNCTION FnCaballoGanador(@nombre varChar(100), @fechaIncio date, @fechaFin date)
+RETURNS TABLE
+RETURN(SELECT C.ID, ISNULL(CB.Nombre, 'NADA') AS ganador FROM LTCarreras C
+INNER JOIN LTCaballosCarreras CC ON C.ID = CC.IDCarrera
+INNER JOIN LTCaballos CB ON CB.ID = CC.IDCaballo
+WHERE C.Hipodromo = @nombre AND C.Fecha BETWEEN @fechaIncio AND @fechaFin AND CC.Posicion = 1)
+
+SELECT * FROM FnCaballoGanador('Gran Hipodromo de Andalucia', '2000-01-20', '2028-03-03')
+
 
 -- 7.Crea una función FnObtenerSaldo a la que pasemos el ID de un jugador y una fecha y nos devuelva su saldo en esa fecha. Si se omite la fecha, se devolverá el saldo actual
 SELECT * FROM LTJugadores
