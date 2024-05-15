@@ -104,12 +104,50 @@ Where nombre = 'Luis León'
 -- que cree la nueva tabla y haga una copia de los clientes actuales
 
 SELECT * FROM Clientes
+SELECT * FROM backupClientes where nombreB = 'Alberto Andorrano'
 
-CREATE PROCEDURE tablaBackUp
+CREATE or ALTER PROCEDURE tablaBackUp
 AS BEGIN
 CREATE TABLE backupClientes(
-	nombre varChar(100) Primary Key,
-	limCredito int,
-	alta date
+	nombreB varChar(100) Primary Key,
+	limCreditoB int,
+	altaB date
 )
+
+INSERT INTO backupClientes (nombreB, limCreditoB, altaB)
+SELECT nombre, limitecredito, '15-05-2024' FROM Clientes
 END
+
+execute tablaBackUp
+
+
+CREATE OR ALTER TRIGGER updateBackup ON Clientes
+AFTER UPDATE
+AS BEGIN
+
+if UPDATE (nombre)
+	BEGIN
+		UPDATE backupClientes
+		set nombreB = (select nombre from inserted)
+		where nombreB = (select nombre from deleted)
+		
+	END
+else if UPDATE (limiteCredito)
+	BEGIN
+		UPDATE backupClientes
+		set limCreditoB = (select limitecredito from inserted)
+		where limCreditoB = (select limitecredito from deleted)
+	END
+END
+
+
+BEGIN TRANSACTION tranUpdatebu
+UPDATE Clientes
+SET nombre = 'Alberto Andorrano'
+WHERE numclie = 2109
+
+ROLLBACK
+COMMIT TRANSACTION tranUpdatebu
+	
+select * from backupClientes where nombreB='Alberto Andorrano'
+select * from Clientes
