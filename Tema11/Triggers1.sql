@@ -120,7 +120,7 @@ END
 
 execute tablaBackUp
 
-
+--DISABLE TRIGGER updateBackup ON Clientes
 CREATE OR ALTER TRIGGER updateBackup ON Clientes
 AFTER UPDATE
 AS BEGIN
@@ -145,9 +145,45 @@ BEGIN TRANSACTION tranUpdatebu
 UPDATE Clientes
 SET nombre = 'Alberto Andorrano'
 WHERE numclie = 2109
-
 ROLLBACK
-COMMIT TRANSACTION tranUpdatebu
+
+-- DISABLE TRIGGER insertBackup ON Clientes
+CREATE OR ALTER TRIGGER insertBackup ON Clientes
+AFTER Insert
+AS BEGIN
+
+INSERT INTO backupClientes
+SELECT nombre, limiteCredito, FORMAT(GETDATE(), 'dd-MM-yyyy') FROM Inserted
+
+END
 	
-select * from backupClientes where nombreB='Alberto Andorrano'
+begin transaction tranInsertbu
+INSERT INTO Clientes (numclie, nombre, resp, limitecredito)
+VALUES (2222, 'Chester Bennington', 101, 6500)
+ROLLBACK
+
+select * from backupClientes
 select * from Clientes
+
+
+--12. Comprobar en cada inserción de empleado que el número de oficina asignado existe. En caso
+-- contrario asignaremos al empleado a la primera oficina que esté disponible.
+SELECT * FROM Oficinas
+SELECT * FROM Empleados
+
+CREATE OR ALTER TRIGGER oficinasdEj12 ON Empleados
+AFTER INSERT
+AS BEGIN
+	
+	if((SELECT oficina from inserted) IS NULL)
+		BEGIN
+			UPDATE Empleados
+			set oficina = (SELECT MIN(oficina) FROM Oficinas)
+			where numemp = (SELECT numemp FROM inserted)
+		END
+END
+
+BEGIN TRANSACTION empleadoNoOfi
+INSERT INTO Empleados (numemp, nombre, edad, puesto, contrato, jefe, cuota, ventas) 
+VALUES (333, 'Oliver Sykes', 37, 'Representante', '2006-10-20', 104, 350000, 3050)
+ROLLBACK
