@@ -171,6 +171,7 @@ select * from Clientes
 SELECT * FROM Oficinas
 SELECT * FROM Empleados
 
+-- DISABLE TRIGGER oficinasdEj12 ON Empleados
 CREATE OR ALTER TRIGGER oficinasdEj12 ON Empleados
 AFTER INSERT
 AS BEGIN
@@ -187,3 +188,47 @@ BEGIN TRANSACTION empleadoNoOfi
 INSERT INTO Empleados (numemp, nombre, edad, puesto, contrato, jefe, cuota, ventas) 
 VALUES (333, 'Oliver Sykes', 37, 'Representante', '2006-10-20', 104, 350000, 3050)
 ROLLBACK
+
+
+--13. Realizar un disparador que controle la inserción de un nuevo empleado. En el caso que carezca de
+-- jefe, su cuota, ignorando la asignada, debe ser la media de las cuotas del resto de empleados.
+SELECT * FROM Empleados
+SELECT AVG(cuota) media FROM Empleados  where numemp != 102
+
+-- DISABLE TRIGGER cuotaEmpleadoNoJefeEj13 ON Empleados
+CREATE OR ALTER TRIGGER cuotaEmpleadoNoJefeEj13 ON Empleados
+AFTER INSERT
+AS BEGIN
+SET NOCOUNT	 ON
+	if ((SELECT jefe FROM inserted) IS NULL)
+		BEGIN
+		UPDATE Empleados 
+		SET cuota = (SELECT AVG(cuota) media FROM Empleados WHERE numemp NOT IN (SELECT numemp FROM inserted))
+		WHERE numemp = (SELECT numemp FROM inserted) 
+		END
+END
+
+BEGIN TRANSACTION empleadoNoJEfe
+INSERT INTO Empleados (numemp, nombre, edad, puesto, contrato, cuota, ventas) 
+VALUES (333, 'Oliver Sykes', 37, 'Representante', '2006-10-20', 350000, 3050)
+ROLLBACK
+
+--14. Añadir a la base de datos la tabla «productosFabricante» con los campos idfab y cantidad. En dicha
+-- tabla llevaremos un control del número de productos de los que disponemos para cada fabricante; 
+-- indistintamente de la cantidad de cada producto. Crear los trigger necesarios para mantener actualizada esta información.
+SELECT idfab, SUM(existencias) aS total FROM Productos group by idfab
+SELECT * FROM Productos
+
+CREATE or ALTER PROCEDURE productosFabricante
+AS BEGIN
+CREATE TABLE backupClientes(
+	nombreB varChar(100) Primary Key,
+	limCreditoB int,
+	altaB date
+)
+
+INSERT INTO backupClientes (nombreB, limCreditoB, altaB)
+SELECT nombre, limitecredito, '15-05-2024' FROM Clientes
+END
+
+execute tablaBackUp
