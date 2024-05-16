@@ -216,19 +216,20 @@ ROLLBACK
 --14. Añadir a la base de datos la tabla «productosFabricante» con los campos idfab y cantidad. En dicha
 -- tabla llevaremos un control del número de productos de los que disponemos para cada fabricante; 
 -- indistintamente de la cantidad de cada producto. Crear los trigger necesarios para mantener actualizada esta información.
-SELECT idfab, SUM(existencias) aS total FROM Productos group by idfab
+SELECT idfab, existencias aS total FROM Productos
 SELECT * FROM Productos
 
-CREATE or ALTER PROCEDURE productosFabricante
+CREATE or ALTER PROCEDURE createProductoFabricante
 AS BEGIN
-CREATE TABLE backupClientes(
-	nombreB varChar(100) Primary Key,
-	limCreditoB int,
-	altaB date
+CREATE TABLE productosFabricante(
+	idfab varChar(100) Primary Key,
+	cantidad int
 )
 
-INSERT INTO backupClientes (nombreB, limCreditoB, altaB)
-SELECT nombre, limitecredito, '15-05-2024' FROM Clientes
+INSERT INTO productosFabricante (idfab, cantidad)
+SELECT idfab, existencias FROM Productos
 END
 
-execute tablaBackUp
+execute createProductoFabricante
+
+SELECT * FROM productosFabricante
