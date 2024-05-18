@@ -233,3 +233,18 @@ END
 execute createProductoFabricante
 
 SELECT * FROM productosFabricante
+
+CREATE OR ALTER TRIGGER tgr_updateProductos ON Productos
+AFTER UPDATE 
+AS BEGIN
+	UPDATE productosFabricante 
+	set cantidad = (SELECT existencias FROM inserted)
+	WHERE idfab = (SELECT idfab FROM inserted)
+END
+
+BEGIN TRANSACTION updProd
+Update Productos
+SET existencias = 100
+WHERE idfab = 'aci'
+
+Rollback
