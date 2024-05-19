@@ -178,17 +178,82 @@ EXECUTE ej09
 -- El procedimiento devolverá los subordinados del empleado escrito, si el empleado no existe en la base de datos, 
 -- informaremos de ello, si el empleado no tiene subordinados, lo informa remos con un mensaje y mostraremos su jefe.
 -- Mostrar el número de empleado, Apellido, Oficio y Departamento de los subordinados.
-CREATE PROCEDURE ej10
-@nombre varchar(50)
+
+CREATE OR ALTER PROCEDURE ej10
+@apellido varchar(50)
 AS BEGIN 
-IF @nombre IS NOT NULL AND @nombre IN (SELECT DNombre FROM Dept)
-    SELECT d.Dept_No, D.DNombre, COUNT(E.Emp_No) as numEmp, d.DNombre FROM Dept as d
-    INNER JOIN Emp as E
-    ON D.Dept_No=E.Dept_No
-    GROUP BY D.Dept_No, D.DNombre
-ELSE
-    PRINT 'El nombre introducido no es correcto'
+IF (((SELECT Emp_No FROM Emp WHERE Apellido = @apellido)) IS NOT NULL)
+		BEGIN 
+			if exists ((SELECT EMp_No, Apellido, OFicio, Dept_No FROM Emp
+			WHERE dir = (SELECT Emp_No FROM Emp WHERE Apellido = @apellido)))
+				BEGIN 
+					(SELECT EMp_No, Apellido, OFicio, Dept_No FROM Emp
+					WHERE dir = (SELECT Emp_No FROM Emp WHERE Apellido = @apellido))
+				END
+			ELSE
+				BEGIN
+					PRINT ('El nombre introducido no tiene subordinados')
+					declare @jefe int = (SELECT dir FROM Emp WHERE Apellido = @apellido)
+					SELECT EMp_no, Apellido FROM Emp WHERE EMp_no = @jefe
+				END
+		END
+	ELSE 
+		BEgin
+			PRINT ('El nombre introducido no existe')
+		END
 END
 
+
 EXECUTE ej10
-@nombre = 'CONTABILIDAD'
+@apellido = 'ASFADSFV'
+
+
+--11) Crear procedimiento que borre un empleado que coincida con los parámetros indicados (los parámetros serán todos los campos de la tabla empleado).
+SELECT * FROM Emp
+
+CREATE OR ALTER PROCEDURE ej11
+@empNo int, @apellido varChar(50), @oficio varChar(50), @dir int, @fechaAlta date, @salario money, @comision money, @deptNo int
+AS BEGIN
+	DELETE Emp
+	WHERE Emp_No = @empNo AND Apellido = @apellido AND Oficio = @oficio AND	Dir = @dir AND Fecha_Alt = @fechaAlta AND Salario = @salario AND Comision = @comision AND Dept_No = @deptNo
+END
+
+--12 
+SELECT * FROM Emp
+create OR ALTER PROCEDURE ej12
+@empNo int, @apellido varChar(50), @oficio varChar(50), @dir int, @fechaAlta date, @salario money, @comision money, @deptNo int
+AS BEGIN
+	IF EXISTS (SELECT * FROM Emp WHERE Emp_No = @empNo AND Apellido = @apellido AND Oficio = @oficio AND	Dir = @dir AND Fecha_Alt = @fechaAlta AND Salario = @salario AND Comision = @comision AND Dept_No = @deptNo)
+		BEGIN
+			BEGIN TRY
+			print('TRY')
+				DELETE Emp
+				WHERE Emp_No = @empNo --AND Apellido = @apellido AND Oficio = @oficio AND	Dir = @dir AND Fecha_Alt = @fechaAlta AND Salario = @salario AND Comision = @comision AND Dept_No = @deptNo
+				
+				BEGIN 
+					PRINT('DELETE HECHO BIEN')
+				END
+			END TRY
+			BEGIN CATCH
+				PRINT('ERROR')
+				--PRINT('DATOS INTRODUCIDOS ' + @empNo + ' ' + @apellido + ' ' + @oficio + ' ' + @dir + ' ' + @fechaAlta 
+				--+ ' ' + @salario + ' ' + @comision + ' ' + @deptNo)
+			END CATCH
+		END
+END
+
+BEGIN TRANSACTION EJ12
+DELETE Emp
+WHERE Emp_No = 7119
+
+
+execute ej12
+@empNo = 7119,
+@apellido = 'SERRA', 
+@oficio = 'DIRECTOR', 
+@dir = 7782,
+@fechaAlta = '1983-11-19 00:00:00', 
+@salario = 225000.00, 
+@comision = 39000.00, 
+@deptNo = 20
+ROLLBACK
