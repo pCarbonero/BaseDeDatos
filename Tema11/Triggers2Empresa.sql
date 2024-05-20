@@ -23,14 +23,30 @@ GROUP BY O.OrderId
 CREATE OR ALTER TRIGGER trg_noMas10 On [Order Details]
 AFTER INSERT
 AS BEGIN 
-	if ((SELECT COUNT(DISTINCT ProductID) 
-        FROM [Order Details] 
-        WHERE OrderID = (SELECT ORderId FROM inserted)) > 10)
+declare @var int = (SELECT COUNT(DISTINCT ProductID) FROM [Order Details] 
+					WHERE OrderID = (SELECT ORderId FROM inserted))
+
+	if (@var > 10)
 		BEGIN
-		PRINT('HAY MÁS DE 10')
-		ROLLBACK
+			PRINT('HAY MÁS DE 10')
+			ROLLBACK
 		END
 END
+
+select * from Products
+select * from [Order Details]
+
+
+Begin Transaction prueba1
+Insert into [Order Details] (OrderID, ProductID) Values (10248, 1)
+Insert into [Order Details] (OrderID, ProductID) Values (10248, 2)
+Insert into [Order Details] (OrderID, ProductID) Values (10248, 3)
+Insert into [Order Details] (OrderID, ProductID) Values (10248, 4)
+Insert into [Order Details] (OrderID, ProductID) Values (10248, 5)
+Insert into [Order Details] (OrderID, ProductID) Values (10248, 6)
+Insert into [Order Details] (OrderID, ProductID) Values (10248, 7)
+Insert into [Order Details] (OrderID, ProductID) Values (10248, 8)
+rollback
 
 --2.- Haz un trigger para que un cliente no pueda hacer más de 10 pedidos al año (años naturales) de la misma categoría
 SELECT * FROM Orders
