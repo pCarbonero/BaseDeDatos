@@ -34,25 +34,31 @@ WHERE numemp = 999
 
 --7. Realizar una versión mejorada del ejercicio anterior donde se compruebe que se desea modificar el campo nombre.
 Select * FROM Empleados
-DISBLE TRIGGER donEmpledo ON Empleados
+
+enaBLE TRIGGER donEmpledo ON Empleados
+
 CREATE OR ALTER TRIGGER donEmpledo ON Empleados
 AFTER UPDATE
 AS BEGIN
 if UPDATE (nombre)
-begin
-UPDATE Empleados
-SET nombre = CONCAT('Don ', nombre)
-WHERE numemp = (SELECT numemp FROM inserted)
-end
+	begin
+		UPDATE Empleados
+		SET nombre = CONCAT('Don ', nombre)
+		WHERE numemp = (SELECT numemp FROM inserted)
+	end
 END
+
+begin transaction prueba1
 
 UPDATE Empleados
 SET nombre = 'Lucas Ocampos' 
-WHERE numemp = 990
+WHERE numemp = 110
 
 UPDATE Empleados
 SET numemp = 990
-WHERE numemp = 998
+WHERE numemp = 110
+
+rollback
 
 --8. En Empresa, diseñar un disparador que compruebe cada vez que insertamos un empleado que su
 -- edad esté comprendida entre 16 –edad mínima para trabajar– y 67 –edad de jubilación–.	
@@ -196,6 +202,7 @@ SELECT * FROM Empleados
 SELECT AVG(cuota) media FROM Empleados  where numemp != 102
 
 -- DISABLE TRIGGER cuotaEmpleadoNoJefeEj13 ON Empleados
+disable TRIGGER cuotaEmpleadoNoJefeEj13 ON Empleados
 CREATE OR ALTER TRIGGER cuotaEmpleadoNoJefeEj13 ON Empleados
 AFTER INSERT
 AS BEGIN
@@ -233,7 +240,7 @@ END
 execute createProductoFabricante
 
 SELECT * FROM productosFabricante
-
+disable TRIGGER tgr_updateProductos ON Productos
 CREATE OR ALTER TRIGGER tgr_updateProductos ON Productos
 AFTER UPDATE 
 AS BEGIN

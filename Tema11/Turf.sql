@@ -66,7 +66,35 @@ ELSE
 return @dineroObtenido
 END
 	
-SELECT dbo.FnPremioConseguido(2)
+SELECT dbo.FnPremioConseguido(1)
+
+--------CON CASE
+CREATE OR ALTER function FnPremioConseguido2(@idApuesta int)
+RETURNS numeric
+AS BEGIN
+declare @caballo numeric
+declare @carrera numeric
+declare @posicion numeric
+declare @importe numeric
+declare @premio numeric
+declare @dineroObtenido numeric
+
+SELECT @caballo = IDcaballo, @carrera = IDCarrera, @importe = Importe FROM LTApuestas WHERE ID = @idApuesta
+SELECT @posicion = Posicion FROM LTCaballosCarreras WHERE @caballo = IDCaballo AND @carrera = IDCarrera
+
+SET @dineroObtenido = 
+	case
+		when @posicion = 1 then (SELECT Premio1*@importe FROM LTCaballosCarreras WHERE @caballo = IDCaballo AND @carrera = IDCarrera)
+		when @posicion = 2 then (SELECT Premio2*@importe FROM LTCaballosCarreras WHERE @caballo = IDCaballo AND @carrera = IDCarrera)
+		when @posicion IS NULL then  NULL
+		else -@importe
+	end
+
+return @dineroObtenido
+END
+
+SELECT dbo.FnPremioConseguido(1)
+SELECT dbo.FnPremioConseguido2(1)
 
 --4. 
 SELECT * FROM LTApuestas
